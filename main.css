@@ -1,0 +1,15 @@
+body {
+    color: blue;
+}
+
+.hidden {
+    display: none;
+}
+
+#resources div {
+    border-style: dotted;
+    border-color: green;
+    border-radius: 3px;
+    color: red;
+}
+
