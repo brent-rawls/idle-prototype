@@ -10,7 +10,8 @@ var wood = {
     amt: 0,
     cap: 20,
     perSecond: 0,
-    inForest: 10,
+    inForest: 1000,
+    gatheredFromForest: 0,
     residue: 0,
 }
 var stone = {
@@ -29,56 +30,59 @@ var research = {
     residue: 0,
 }
 
-function clickGatherWood() {
+
+
+
+function gatherWood() {
     if (wood.inForest > 0) {
         wood.inForest--;
         gainResource(wood, 1);
+        wood.gatheredFromForest++;
+        if (wood.gatheredFromForest == 3) {
+            addMessage("Better start thinking about shelter.");
+            createBuildingButton(cottage);
+        }
     }
     if(wood.inForest <= 0){
         addMessage("No more wood to gather.");
         document.getElementById("clickGatherWood").classList.add("hidden");
     }
+    document.querySelector("#wood").classList.remove("hidden");
 }
-
-//redo this, make buildings into objects, make costs into arrays
-function clickBuildCottage() {
-    if (wood.amt < 5) {
-        addMessage("You'll need more wood to keep the elements out.");
-    }
-    else {
-        spendResource(wood, 5);
-        addMessage("A cozy place to stay, for now.");
-        document.getElementById("buildCottage").classList.add("hidden");
-        var newDiv = document.createElement("div");
-        newDiv.id = "cottage";
-        newDiv.className = "cottage class";
-        document.getElementById("buildingsList").appendChild(newDiv);
-        newDiv.innerHTML = "this is your new cottage";
-    }
-}
-
 
 
 function gainResource(resource, qty) {
     resource.amt += qty;
     if(resource.cap > 0 && resource.amt > resource.cap) resource.amt = resource.cap;
-    document.getElementById(resource.name).innerHTML = resource.name + ": " + resource.amt + "/" + resource.cap;
-    //document.getElementById(resource.name).innerHTML = "${resource.name}: ${resource.amt}/${resource.cap}";
+    updateResourceDisplay(resource);
 }
 function spendResource(resource, qty) {
     resource.amt -= qty;
     if(resource.cap < 0) resource.amt = 0;
-    document.getElementById(resource.name).innerHTML = resource.name + ": " + resource.amt + "/" + resource.cap;
-    //document.getElementById(resource.name).innerHTML = "${resource.name}: ${resource.amt}/${resource.cap}";
+    updateResourceDisplay(resource);
+}
+function updateResourceDisplay(resource) {
+    var resElement = document.getElementById(resource.name);
+    resElement.classList.remove("hidden");
+    resElement.querySelector(".display").innerHTML = resource.name + ": " + resource.amt + "/" + resource.cap;
 }
 
 
-
-//messaging
-function addMessage(text) {
-    var msg = document.createElement("DIV");
-    msg.innerHTML = text;
-    document.getElementById("messages").prepend(msg);
+function payCost(costArray) {
+    if (costArray.length % 2 != 0) {
+       //error, cost array didn't have an even number of elements
+       return false;  
+    } 
+    for (let i = 0; i < costArray.length; i += 2) {
+        if (costArray[i].amt < costArray[i + 1]) {
+            //not enough of this resource; can't afford purchase
+            return false;
+        }
+    }
+    for (let i = 0; i < costArray.length; i += 2) {
+        spendResource(costArray[i], costArray[i + 1]);
+    }
+    return true;
 }
 
 // this is for passive gathering and float values (e.g. 0.1 resource/sec)
@@ -91,6 +95,26 @@ function gradualGainResource(resource) {
     }
 }
 
+// THE FOREST
+//-----------------------------------------------------------
+function tapForestLine() {
+    // TODO: show manaflow
+    mana.perSecond += 1;
+    document.querySelector("#tapForestLine").classList.add("hidden");
+}
+
+
+
+
+
+// ADD EVENT LISTENERS TO INITIAL BUTTONS
+window.onload = function() {
+    document.querySelector("#clickGatherWood").addEventListener("click", gatherWood);
+    document.querySelector("#tapForestLine").addEventListener("click", tapForestLine);    
+};
+
+
+
 // per-second events
 setInterval(passiveGathering, 1000);
 
@@ -98,6 +122,3 @@ function passiveGathering() {
     gradualGainResource(mana);
     gradualGainResource(wood);
 }
-
-// save/load/reset/initialize
-function resetAll(){}
