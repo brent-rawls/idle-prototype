@@ -26,7 +26,7 @@ body {
   grid-column: 1/2;
   grid-row: 2/4;
 }
-#resources div {
+#resources  div div {
   background-color: #99c;
   font-size: 12px;
   color: #223;

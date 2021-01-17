@@ -2,14 +2,14 @@ document.onload = function(){
     createDebug();
 }
 
-function createDebug(building) {
+function createDebug() {
     var debugButton = document.createElement("div");
     debugButton.id = "clickDebug";
     debugButton.className = "debug button";
     document.querySelector("#actions").appendChild(debugButton);
     debugButton.innerHTML = "DEBUG";
     debugButton.addEventListener("click", function(event) {
-        clickDebug(building);
+        clickDebug();
     });
 }
 

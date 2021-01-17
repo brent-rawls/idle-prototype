@@ -1,4 +1,4 @@
-//messaging
+// messaging
 function addMessage(text) {
     var messages = document.querySelector("#messages");
     var msg = document.createElement("DIV");

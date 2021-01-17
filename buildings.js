@@ -1,6 +1,8 @@
 var cottage = {
     name: "cottage", 
     cost: [wood, 5],
+    quantity: 0,
+    maxQuantity: 1,
     buildSuccess: "a cozy cottage in the woods",
     buildFailure: "you'll need more wood to keep the elements at bay",
     buildButtonId: "buildCottage",
@@ -8,6 +10,8 @@ var cottage = {
 var library = {
     name: "library", 
     cost: [wood, 5],
+    quantity: 0,
+    maxQuantity: 1,
     buildSuccess: "time to fill this place with books",
     buildFailure: "not enough resources",
     buildButtonId: "buildLibrary",
@@ -15,6 +19,8 @@ var library = {
 var shed = {
     name: "shed", 
     cost: [wood, 5],
+    quantity: 0,
+    maxQuantity: 10,
     buildSuccess: "still time to put supplies away before the frost",
     buildFailure: "not enough resources",
     buildButtonId: "buildShed",
@@ -22,6 +28,8 @@ var shed = {
 var garden = {
     name: "garden", 
     cost: [wood, 5, mana, 10],
+    quantity: 0,
+    maxQuantity: 1,
     buildSuccess: "magic to coax life from the earth",
     buildFailure: "not enough resources",
     buildButtonId: "buildGarden",
@@ -29,6 +37,8 @@ var garden = {
 var workshop = {
     name: "workshop", 
     cost: [wood, 5],
+    quantity: 0,
+    maxQuantity: 1,
     buildSuccess: "busy hands are powerful spells",
     buildFailure: "not enough resources",
     buildButtonId: "buildWorkshop",
@@ -39,9 +49,13 @@ function unlockNewBuildings(old){
     switch(old){
         case(cottage):
             createBuildingButton(library);
-            createBuildingButton(shed);
-            createBuildingButton(garden);
             createBuildingButton(workshop);
+            break;
+        case(workshop):
+            createBuildingButton(shed);
+            break;
+        case(library):
+            createBuildingButton(garden);
             break;
         default: break;
     }
@@ -71,9 +85,12 @@ function buildBuilding(building) {
     let canBuild = payCost(building.cost);
     if (canBuild == true) {
         addMessage(building.buildSuccess);
-        document.getElementById(building.buildButtonId).classList.add("hidden");
         createBuildingIndicator(building);
         unlockNewBuildings(building);
+        building.quantity++;
+        if (building.maxQuantity != 0 && building.quantity >= building.maxQuantity){
+            document.getElementById(building.buildButtonId).classList.add("hidden");
+        }
     } else {
         addMessage(building.buildFailure);
     }
